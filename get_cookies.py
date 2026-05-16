@@ -220,8 +220,14 @@ def _capture_via_cdp():
 #  交互式选择 + 写入 config.yml
 # ============================================================
 
+def _app_dir():
+    if getattr(sys, "frozen", False):
+        return os.getcwd()
+    return os.path.dirname(os.path.abspath(__file__))
+
+
 def _read_existing_config():
-    config_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "config.yml")
+    config_path = os.path.join(_app_dir(), "config.yml")
     if os.path.isfile(config_path):
         with open(config_path, "r", encoding="utf-8") as f:
             data = yaml.safe_load(f) or {}
@@ -267,7 +273,7 @@ def _select_account_index(accounts):
 
 def update_config(account, index=None):
     """写入 config.yml。index=None 追加，index=N 覆盖第 N 个账号。"""
-    config_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "config.yml")
+    config_path = os.path.join(_app_dir(), "config.yml")
     existing = _read_existing_config()
 
     accounts = existing.get("accounts", [])

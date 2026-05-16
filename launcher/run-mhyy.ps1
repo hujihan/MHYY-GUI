@@ -26,6 +26,9 @@ $RequirementsPath = Join-Path $ProjectRoot "requirements.txt"
 $MainPath = Join-Path $ProjectRoot "main.py"
 $GetCookiePath = Join-Path $ProjectRoot "get_cookies.py"
 $ConfigPath = Join-Path $ProjectRoot "config.yml"
+$MainExePath = Join-Path $ProjectRoot "MHYY.exe"
+$GetCookieExePath = Join-Path $ProjectRoot "MHYY-GetCookies.exe"
+$IsRelease = (Test-Path $MainExePath) -and (Test-Path $GetCookieExePath)
 
 function Write-Step {
     param([string]$Message)
@@ -131,7 +134,10 @@ function Ensure-Dependencies {
     param([string]$PythonPath)
 
     Write-Step (T "5q2j5Zyo5qOA5p+lIFB5dGhvbiDkvp3otZbljIXjgII=")
+    $prevEAP = $ErrorActionPreference
+    $ErrorActionPreference = "Continue"
     & $PythonPath -c "import httpx, yaml, sentry_sdk, cryptography" *> $null
+    $ErrorActionPreference = $prevEAP
     if ($LASTEXITCODE -eq 0) {
         Write-Step (T "5L6d6LWW5YyF5bey5bCx57uq44CC")
         return
@@ -145,14 +151,18 @@ function Ensure-Dependencies {
     Invoke-Checked -FilePath $PythonPath -Arguments @("-m", "pip", "install", "-r", $RequirementsPath) -ErrorMessage (T "5a6J6KOF5L6d6LWW5YyF5aSx6LSl")
 }
 
-if (-not (Test-Path $MainPath)) {
-    throw ((T "5pyq5om+5YiwIG1haW4ucHnvvJo=") + $MainPath)
+if (-not $IsRelease) {
+    if (-not (Test-Path $MainPath)) {
+        throw ((T "5pyq5om+5YiwIG1haW4ucHnvvJo=") + $MainPath)
+    }
 }
 
 Set-Location $ProjectRoot
 
-$python = Ensure-PythonEnvironment
-Ensure-Dependencies -PythonPath $python
+if (-not $IsRelease) {
+    $python = Ensure-PythonEnvironment
+    Ensure-Dependencies -PythonPath $python
+}
 
 if ($InstallOnly) {
     Write-Step (T "6L+Q6KGM546v5aKD5bey5YeG5aSH5a6M5oiQ44CC")
@@ -168,6 +178,13 @@ $env:PYTHONIOENCODING = "utf-8"
 $env:MHYY_LOGLEVEL = $LogLevel
 
 if ($GetCookie) {
+    if ($IsRelease) {
+        Write-Step (T "5q2j5Zyo6L+Q6KGMIE1IWVktR2V0Q29va2llcy5leGXvvIzoh6rliqjojrflj5bphY3nva7kv6Hmga/jgII=")
+        & $GetCookieExePath
+        $exitCode = $LASTEXITCODE
+        Write-Step ((T "TUhZWS1HZXRDb29raWVzLmV4ZSDlt7Lnu5PmnZ/vvIzpgIDlh7rnoIHvvJo=") + $exitCode + (T "44CC"))
+        exit $exitCode
+    }
     if (-not (Test-Path $GetCookiePath)) {
         throw ((T "5pyq5om+5YiwIGdldF9jb29raWVzLnB577ya") + $GetCookiePath)
     }
@@ -184,6 +201,14 @@ if ($SkipWait) {
     $env:MHYY_DEBUG = "True"
 } else {
     Remove-Item Env:\MHYY_DEBUG -ErrorAction SilentlyContinue
+}
+
+if ($IsRelease) {
+    Write-Step ((T "5q2j5Zyo6L+Q6KGMIE1IWVkuZXhl77yM5pel5b+X57qn5Yir77ya") + $LogLevel + (T "44CC"))
+    & $MainExePath
+    $exitCode = $LASTEXITCODE
+    Write-Step ((T "TUhZWS5leGUg5bey57uT5p2f77yM6YCA5Ye656CB77ya") + $exitCode + (T "44CC"))
+    exit $exitCode
 }
 
 Write-Step ((T "5q2j5Zyo6L+Q6KGMIG1haW4ucHnvvIzml6Xlv5fnuqfliKvvvJo=") + $LogLevel + (T "44CC"))

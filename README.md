@@ -1,3 +1,12 @@
+这是一个基于https://github.com/GamerNoTitle/MHYY项目的GUI版本
+去Releases下载，双击MHYY-Launcher.bat
+然后点“一键获取cookie”会自动打开浏览器，你登录进去就好
+登录完成之后回到主界面点一键运行就行
+有问题就在这提issues，不要去原作者那。
+感谢使用！
+
+以下是原项目的.md
+------------------------------------------------------------------------------------------------------------------------------------------------------------
 # MHYY-AutoCheckin
 
 ![MHYY-AutoCheckin](https://socialify.git.ci/GamerNoTitle/MHYY/image?forks=1&language=1&name=1&owner=1&stargazers=1&theme=Light)

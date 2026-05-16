@@ -1,0 +1,6 @@
+config.yml
+venv
+.venv/
+logs/
+__pycache__/
+.claude/
